@@ -1,0 +1,159 @@
+/* General Styling */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #F3F2EF;
+  color: #191919;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(to right, #004182, #0A66C2);
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.hero-content {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2rem;
+  border-radius: 12px;
+}
+
+.hero-content h1 {
+  font-size: 2.8rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.hero-content p {
+  font-size: 1.3rem;
+  margin-bottom: 25px;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 14px 28px;
+  background-color: #0A66C2;
+  color: white;
+  font-size: 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #004182;
+}
+
+/* Features Section */
+.features-section {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 50px 10%;
+  flex-wrap: wrap;
+}
+
+.feature-card {
+  background: white;
+  padding: 22px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  width: 320px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card h2 {
+  font-size: 1.6rem;
+  color: #0A66C2;
+  margin-bottom: 12px;
+}
+
+.feature-card p {
+  font-size: 1rem;
+  color: #555;
+}
+
+.feature-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Users Section */
+.users-section {
+  text-align: center;
+  padding: 50px 10%;
+}
+
+.users-section h2 {
+  font-size: 2rem;
+  margin-bottom: 25px;
+  color: #191919;
+}
+
+.users-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.user-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.user-card h3 {
+  font-size: 1.4rem;
+  color: #0A66C2;
+  margin-bottom: 6px;
+}
+
+.user-card p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Error & Loading States */
+.error {
+  color: red;
+  font-size: 1.1rem;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 {
+      font-size: 2.2rem;
+  }
+
+  .features-section {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .feature-card {
+      width: 90%;
+  }
+
+  .users-list {
+      grid-template-columns: 1fr;
+  }
+}
