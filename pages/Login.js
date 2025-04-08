@@ -1,18 +1,27 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/Signup.css";
+import "../styles/Login.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    const { email, password } = formData;
 
     if (!email || !password) {
       setError("Please fill in all fields.");
@@ -24,22 +33,28 @@ const Login = () => {
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(formData),
       });
-      
+
       const data = await response.json();
+
       if (!response.ok) {
         throw new Error(data.error || "Invalid credentials.");
       }
-      
-      localStorage.setItem("token", data.token); // Store JWT for authentication
-      alert("Login successful!");
-      navigate("/profile/:userId"); // Redirect to profile page after login
+
+      if (!data.token || !data.userId) {
+        throw new Error("Incomplete response from server.");
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
+      alert("✅ Login successful!");
+      navigate(`/profile/${data.userId}`);
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.message);
+      setError(err.message || "Something went wrong.");
     }
-    
+
     setLoading(false);
   };
 
@@ -50,19 +65,25 @@ const Login = () => {
       <form onSubmit={handleLogin}>
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={handleChange}
           required
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={handleChange}
           required
         />
-        <button type="submit" disabled={loading}>
+        <button
+          type="submit"
+          disabled={loading}
+          className={loading ? "btn-disabled" : ""}
+        >
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>

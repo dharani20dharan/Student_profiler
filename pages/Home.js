@@ -61,7 +61,7 @@ const Home = () => {
                             <li key={user.id} className="user-card" onClick={() => handleUserClick(user.id)}>
                                 <h3>{user.name}</h3>
                                 <p>{user.email}</p>
-                                <p><strong>Skills:</strong> {user.skills}</p>
+                                <p><strong>Department:</strong> {user.department}</p>
                             </li>
                         ))}
                     </ul>
