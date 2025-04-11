@@ -1,0 +1,166 @@
+/* Import a clean, professional Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+    background: linear-gradient(135deg, #eef2f3, #d7e1ec); /* Soft gradient background */
+    font-family: 'Poppins', sans-serif;
+    color: #2c3e50;
+}
+
+/* Glassmorphic Container */
+.signup-container {
+    max-width: 450px;
+    margin: 50px auto;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.signup-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Heading */
+.signup-container h2 {
+    color: #34495e;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Input fields */
+.signup-container input,
+.signup-container textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Focus Effect */
+.signup-container input:focus,
+.signup-container textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0px 0px 10px rgba(52, 152, 219, 0.5);
+}
+
+.signup-container input::placeholder,
+.signup-container textarea::placeholder {
+    color: rgba(44, 62, 80, 0.6);
+}
+
+/* File input */
+.signup-container input[type="file"] {
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: #2980b9;
+}
+
+/* Signup Button */
+.signup-container button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0px 4px 10px rgba(52, 152, 219, 0.4);
+}
+
+.signup-container button:hover {
+    background: linear-gradient(135deg, #2980b9, #1c6690);
+    box-shadow: 0px 4px 15px rgba(52, 152, 219, 0.6);
+    transform: scale(1.05);
+}
+
+/* Disabled button */
+.signup-container button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* Error message */
+.error-message {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* Uploaded files */
+.uploaded-files {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.uploaded-files h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.uploaded-files ul {
+    list-style: none;
+    padding: 0;
+}
+
+.uploaded-files li {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 5px 0;
+    justify-content: space-between;
+}
+
+/* File remove button */
+.remove-file-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.remove-file-btn:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+/* Glow effect on hover */
+@keyframes glow {
+    0% { box-shadow: 0 0 10px rgba(52, 152, 219, 0.3); }
+    50% { box-shadow: 0 0 18px rgba(52, 152, 219, 0.5); }
+    100% { box-shadow: 0 0 10px rgba(52, 152, 219, 0.3); }
+}
+
+.signup-container:hover {
+    animation: glow 1.5s infinite alternate;
+}

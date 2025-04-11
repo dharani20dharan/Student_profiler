@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #f8f9fa, #e0eafc);
+  margin: 0;
+  padding: 0;
+}
+
+.profile-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.profile-picture-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.profile-picture {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #3498db;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+
+.profile-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.profile-card h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+
+.profile-card .email {
+  font-size: 16px;
+  color: #2980b9;
+  margin-bottom: 15px;
+}
+
+.profile-card .bio {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 25px;
+  font-style: italic;
+}
+
+.section {
+  margin-bottom: 25px;
+}
+
+.section h2 {
+  font-size: 20px;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+.section p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #2c3e50;
+}
+
+.section ul {
+  list-style: disc;
+  padding-left: 20px;
+  color: #2c3e50;
+}
+
+.back-btn {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background: #2c80b4;
+  transform: scale(1.03);
+}
+
+.loading,
+.error-message {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 50px;
+  color: #e74c3c;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
