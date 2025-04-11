@@ -1,125 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #f8f9fa, #e0eafc);
+  margin: 0;
+  padding: 0;
+}
+
 .profile-container {
   max-width: 800px;
   margin: 40px auto;
   padding: 20px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  font-family: "Arial", sans-serif;
 }
 
-/* Profile Header */
-.profile-header {
+.profile-picture-container {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #f1f1f1;
-}
-
-/* Profile Picture with Default Placeholder */
-.profile-picture {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #E1E9EE url("https://via.placeholder.com/100?text=👤") center/cover no-repeat;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 40px;
-  color: #555;
-  font-weight: bold;
+  margin-bottom: 20px;
 }
 
-/* If user uploads an image, it will override the default */
-.profile-img {
-  width: 100%;
-  height: 100%;
+.profile-picture {
+  width: 140px;
+  height: 140px;
   object-fit: cover;
-  display: none; /* Hide until an image is uploaded */
+  border-radius: 50%;
+  border: 4px solid #3498db;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* Profile Info */
-.profile-info h1 {
-  margin: 0;
-  font-size: 24px;
-  color: #333;
+
+.profile-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.4s ease-in-out;
 }
 
-.profile-info .email {
-  color: #777;
+.profile-card h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+  color: #2c3e50;
 }
 
-.profile-info .bio {
-  margin-top: 10px;
+.profile-card .email {
   font-size: 16px;
-  color: #555;
+  color: #2980b9;
+  margin-bottom: 15px;
 }
 
-/* Profile Details */
-.profile-details {
+.profile-card .bio {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 25px;
+  font-style: italic;
+}
+
+.section {
+  margin-bottom: 25px;
+}
+
+.section h2 {
+  font-size: 20px;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+.section p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #2c3e50;
+}
+
+.section ul {
+  list-style: disc;
+  padding-left: 20px;
+  color: #2c3e50;
+}
+
+.back-btn {
   margin-top: 20px;
-}
-
-.profile-details h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #0073b1;
-  padding-bottom: 5px;
-  color: #0073b1;
-}
-
-.profile-details p {
+  padding: 12px 20px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 10px;
   font-size: 16px;
-  margin-bottom: 10px;
-  color: #333;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-/* Document Links */
-.documents ul {
-  list-style: none;
-  padding: 0;
+.back-btn:hover {
+  background: #2c80b4;
+  transform: scale(1.03);
 }
 
-.documents ul li {
-  margin-bottom: 8px;
-}
-
-.documents ul li a {
-  text-decoration: none;
-  color: #0073b1;
-  font-weight: bold;
-}
-
-/* Loading & Error Message */
 .loading,
 .error-message {
   text-align: center;
   font-size: 18px;
-  margin-top: 20px;
-  color: red;
+  margin-top: 50px;
+  color: #e74c3c;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .profile-container {
-      width: 90%;
-      padding: 15px;
-  }
-
-  .profile-header {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-  }
-
-  .profile-picture {
-      width: 80px;
-      height: 80px;
-  }
-
-  .profile-info h1 {
-      font-size: 20px;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
