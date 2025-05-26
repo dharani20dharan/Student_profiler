@@ -1,12 +1,13 @@
 require("dotenv").config();
 
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 
@@ -24,7 +25,6 @@ const storage = multer.diskStorage({
         cb(null, uniqueName + path.extname(file.originalname));
     },
 });
-
 const upload = multer({ storage });
 const uploadFields = upload.fields([
     { name: "documents", maxCount: 10 },
@@ -32,19 +32,25 @@ const uploadFields = upload.fields([
 ]);
 
 // ------------------ MySQL Connection ------------------
-const db = mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "12345",
-    database: process.env.DB_NAME || "student_profiles",
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        ca: fs.readFileSync(path.join(__dirname, "certs", "ca.pem")),
+        rejectUnauthorized: false
+    }
 });
 
-db.connect((err) => {
+connection.connect((err) => {
     if (err) {
-        console.error("❌ Database connection failed:", err);
+        console.error("❌ Database connection failed:", err.message);
         process.exit(1);
+    } else {
+        console.log("✅ Connected to Aiven MySQL successfully!");
     }
-    console.log("✅ Connected to MySQL");
 });
 
 // ------------------ Routes ------------------
@@ -62,95 +68,86 @@ app.post("/signup", uploadFields, async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const profilePicFile = req.files?.profilePicture?.[0];
         const profilePicturePath = profilePicFile ? `/uploads/${profilePicFile.filename}` : null;
         const documentFiles = req.files?.documents || [];
 
-        // Parse skills and projects
-        let skills = [];
-        let projects = [];
+        let skills = [], projects = [];
 
         try {
             skills = typeof req.body.skills === "string" ? JSON.parse(req.body.skills) : req.body.skills || [];
             projects = typeof req.body.projects === "string" ? JSON.parse(req.body.projects) : req.body.projects || [];
-        } catch (err) {
+        } catch {
             return res.status(400).json({ error: "Invalid JSON in skills or projects" });
         }
 
-        db.beginTransaction((err) => {
+        connection.beginTransaction((err) => {
             if (err) return res.status(500).json({ error: "Transaction start failed" });
 
             const insertUserSql = `
                 INSERT INTO users 
                 (name, email, password, roll_number, department, year_of_study, phone_number, profile_picture) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
             const userValues = [name, email, hashedPassword, rollNumber, department, yearOfStudy, phoneNumber, profilePicturePath];
 
-            db.query(insertUserSql, userValues, (err, result) => {
-                if (err) return db.rollback(() => res.status(500).json({ error: "User insert failed" }));
+            connection.query(insertUserSql, userValues, (err, result) => {
+                if (err) return connection.rollback(() => res.status(500).json({ error: "User insert failed", detail: err.message }));
 
                 const userId = result.insertId;
                 const totalInserts = skills.length + projects.length + documentFiles.length;
 
                 if (totalInserts === 0) {
-                    return db.commit(err => {
-                        if (err) return db.rollback(() => res.status(500).json({ error: "Transaction commit failed" }));
-                        res.json({ message: "✅ User Registered Successfully" });
+                    return connection.commit(err => {
+                        if (err) return connection.rollback(() => res.status(500).json({ error: "Commit failed" }));
+                        return res.json({ message: "✅ User Registered Successfully" });
                     });
                 }
 
-                let completed = 0;
-                let hasError = false;
-
+                let completed = 0, hasError = false;
                 const checkDone = () => {
                     completed++;
                     if (completed === totalInserts && !hasError) {
-                        db.commit(err => {
-                            if (err) return db.rollback(() => res.status(500).json({ error: "Transaction commit failed" }));
-                            res.json({ message: "✅ User Registered Successfully" });
+                        connection.commit(err => {
+                            if (err) return connection.rollback(() => res.status(500).json({ error: "Commit failed" }));
+                            return res.json({ message: "✅ User Registered Successfully" });
                         });
                     }
                 };
 
-                // Insert Skills
                 skills.forEach(skill => {
-                    const sql = `INSERT INTO skills (user_id, skill_name) VALUES (?, ?)`;
-                    db.query(sql, [userId, skill], (err) => {
+                    connection.query(`INSERT INTO skills (user_id, skill_name) VALUES (?, ?)`, [userId, skill], (err) => {
                         if (err && !hasError) {
                             hasError = true;
-                            return db.rollback(() => res.status(500).json({ error: "Skill insert failed" }));
+                            return connection.rollback(() => res.status(500).json({ error: "Skill insert failed" }));
                         }
                         if (!hasError) checkDone();
                     });
                 });
 
-                // Insert Projects
                 projects.forEach(({ project_name, project_description, links }) => {
-                    const sql = `INSERT INTO projects (user_id, project_name, project_description, links) VALUES (?, ?, ?, ?)`;
-                    db.query(sql, [userId, project_name, project_description, links], (err) => {
-                        if (err && !hasError) {
-                            hasError = true;
-                            return db.rollback(() => res.status(500).json({ error: "Project insert failed" }));
-                        }
-                        if (!hasError) checkDone();
-                    });
+                    connection.query(`INSERT INTO projects (user_id, project_name, project_description, links) VALUES (?, ?, ?, ?)`,
+                        [userId, project_name, project_description, links], (err) => {
+                            if (err && !hasError) {
+                                hasError = true;
+                                return connection.rollback(() => res.status(500).json({ error: "Project insert failed" }));
+                            }
+                            if (!hasError) checkDone();
+                        });
                 });
 
-                // Insert Documents
                 documentFiles.forEach(doc => {
-                    const sql = `INSERT INTO documents (user_id, document_name, file_path) VALUES (?, ?, ?)`;
-                    db.query(sql, [userId, doc.originalname, `/uploads/${doc.filename}`], (err) => {
-                        if (err && !hasError) {
-                            hasError = true;
-                            return db.rollback(() => res.status(500).json({ error: "Document insert failed" }));
-                        }
-                        if (!hasError) checkDone();
-                    });
+                    connection.query(`INSERT INTO documents (user_id, document_name, file_path) VALUES (?, ?, ?)`,
+                        [userId, doc.originalname, `/uploads/${doc.filename}`], (err) => {
+                            if (err && !hasError) {
+                                hasError = true;
+                                return connection.rollback(() => res.status(500).json({ error: "Document insert failed" }));
+                            }
+                            if (!hasError) checkDone();
+                        });
                 });
             });
         });
-
     } catch (err) {
         console.error("❌ Signup Failure:", err);
         res.status(500).json({ error: "Internal Server Error" });
@@ -162,7 +159,7 @@ app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
     const sql = "SELECT * FROM users WHERE email = ?";
-    db.query(sql, [email], async (err, results) => {
+    connection.query(sql, [email], async (err, results) => {
         if (err) return res.status(500).json({ error: "Database error during login" });
         if (results.length === 0) return res.status(400).json({ error: "User not found" });
 
@@ -194,31 +191,29 @@ app.get("/profile/:userId", (req, res) => {
     const getSkillsSql = `SELECT skill_name FROM skills WHERE user_id = ?`;
     const getDocumentsSql = `SELECT document_name AS name, file_path AS file FROM documents WHERE user_id = ?`;
 
-    db.query(getUserSql, [userId], (err, userResults) => {
+    connection.query(getUserSql, [userId], (err, userResults) => {
         if (err) return res.status(500).json({ error: "Error fetching user" });
         if (userResults.length === 0) return res.status(404).json({ error: "User not found" });
 
         const user = userResults[0];
 
-        db.query(getProjectsSql, [userId], (err, projectResults) => {
+        connection.query(getProjectsSql, [userId], (err, projectResults) => {
             if (err) return res.status(500).json({ error: "Error fetching projects" });
 
-            db.query(getSkillsSql, [userId], (err, skillResults) => {
+            connection.query(getSkillsSql, [userId], (err, skillResults) => {
                 if (err) return res.status(500).json({ error: "Error fetching skills" });
 
-                const skills = skillResults.map(skill => skill.skill_name);
-
-                db.query(getDocumentsSql, [userId], (err, documentResults) => {
+                connection.query(getDocumentsSql, [userId], (err, documentResults) => {
                     if (err) return res.status(500).json({ error: "Error fetching documents" });
 
                     const fullProfile = {
                         ...user,
                         projects: projectResults,
-                        skills,
+                        skills: skillResults.map(s => s.skill_name),
                         documents: documentResults,
                     };
 
-                    return res.json({ message: "Profile data retrieved", user: fullProfile });
+                    res.json({ message: "Profile data retrieved", user: fullProfile });
                 });
             });
         });
@@ -226,12 +221,31 @@ app.get("/profile/:userId", (req, res) => {
 });
 
 // -------- Fetch All Users (Dev Test) --------
+// -------- Fetch All Users (Dev Test) --------
 app.get("/users", (req, res) => {
-    db.query("SELECT * FROM users", (err, results) => {
-        if (err) return res.status(500).json({ error: "Database error while fetching users" });
+    console.log("📥 Incoming GET /users request");
+
+    connection.query("SELECT * FROM users", (err, results) => {
+        if (err) {
+            console.error("❌ Error fetching users:", err.message);
+            return res.status(500).json({ error: "Database error while fetching users", detail: err.message });
+        }
+
         res.json(results);
     });
 });
+
+// -------- Test DB Connection Route --------
+app.get("/test-db", (req, res) => {
+    connection.query("SELECT 1 + 1 AS result", (err, result) => {
+        if (err) {
+            console.error("❌ DB Test Failed:", err.message);
+            return res.status(500).json({ error: "DB connection test failed", detail: err.message });
+        }
+        res.json({ message: "✅ DB is working", result });
+    });
+});
+
 
 // ------------------ Start Server ------------------
 const PORT = process.env.PORT || 5000;
